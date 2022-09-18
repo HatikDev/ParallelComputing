@@ -18,7 +18,6 @@ void generateDataBatch(size_t batchSize, VecMatrix& matrixes)
 
 void generateData(size_t N, std::string inFileName)
 {
-    size_t batchSize = 10;
     size_t done = 0;
     VecMatrix matrixes(batchSize, Matrix());
     cleanFile(inFileName);
