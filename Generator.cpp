@@ -22,11 +22,13 @@ void generateData(size_t N, std::string inFileName)
     VecMatrix matrixes(batchSize, Matrix());
     cleanFile(inFileName);
 
+    startWriting(inFileName);
     while (done < N)
     {
         size_t count = std::min(batchSize, N - done);
         generateDataBatch(count, matrixes);
-        serializeDataBatch(inFileName, matrixes.begin(), matrixes.begin() + count);
+        serializeDataBatch(matrixes.begin(), matrixes.begin() + count);
         done += batchSize;
     }
+    finishWriting();
 }

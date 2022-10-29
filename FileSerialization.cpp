@@ -4,6 +4,50 @@
 #include <iostream>
 #include <fstream>
 
+namespace
+{
+    static std::ifstream inputFile;
+    static std::ofstream outputFile;
+    static bool isInputFileOpen = false;
+    static bool isOutputFileOpen = false;
+};
+
+void startWriting(std::string fileName)
+{
+    if (isOutputFileOpen)
+        throw std::logic_error("File is already open");
+
+    outputFile = std::ofstream(fileName, std::ofstream::app);
+    if (!outputFile)
+        throw std::logic_error("Can't open file");
+
+    isOutputFileOpen = true;
+}
+
+void finishWriting()
+{
+    outputFile.close();
+    isOutputFileOpen = false;
+}
+
+void startReading(std::string fileName)
+{
+    if (isInputFileOpen)
+        throw std::logic_error("File is already open");
+
+    inputFile = std::ifstream(fileName);
+    if (!inputFile)
+        throw std::logic_error("Can't open file");
+
+    isInputFileOpen = true;
+}
+
+void finishReading()
+{
+    inputFile.close();
+    isInputFileOpen = false;
+}
+
 void cleanFile(std::string fileName)
 {
     std::ofstream file(fileName, std::ios::trunc);
@@ -12,38 +56,25 @@ void cleanFile(std::string fileName)
 
 void serializeTimeStamp(std::string fileName, size_t timeStamp)
 {
-    std::ofstream file(fileName, std::ofstream::app);
-    if (!file)
-        throw std::logic_error("Can't open file");
-
-    file << std::endl << std::endl << "Time: " << timeStamp;
-    file.close();
+    outputFile << std::endl << std::endl << "Time: " << timeStamp;
 }
 
-void serializeDataBatch(std::string inFileName, VecMatrixIt begin, VecMatrixIt end)
+void serializeDataBatch(VecMatrixIt begin, VecMatrixIt end)
 {
-    std::ofstream file(inFileName, std::ofstream::app);
-    if (!file)
-        throw std::logic_error("Can't open file");
-
     for (auto it = begin; it != end; ++it)
     {
         for (size_t i = 0; i < M; ++i)
         {
             for (size_t j = 0; j < M; ++j)
             {
-                file << std::setw(2) << std::setfill('0') << std::hex << (int)(*it)[i][j];
+                outputFile << std::setw(2) << std::setfill('0') << std::hex << (int)(*it)[i][j];
             }
         }
     }
-
-    file.close();
 }
 
-void deserializeDataBatch(std::string inFileName, VecMatrixIt begin, VecMatrixIt end)
+void deserializeDataBatch(VecMatrixIt begin, VecMatrixIt end)
 {
-    std::ifstream file(inFileName);
-
     char temp[] = "--";
     for (auto it = begin; it != end; ++it)
     {
@@ -51,11 +82,9 @@ void deserializeDataBatch(std::string inFileName, VecMatrixIt begin, VecMatrixIt
         {
             for (size_t j = 0; j < M; ++j)
             {
-                file >> temp[0] >> temp[1];
+                inputFile >> temp[0] >> temp[1];
                 (*it)[i][j] = static_cast<uint8_t>(strtoul(temp, NULL, 16));
             }
         }
     }
-
-    file.close();
 }
