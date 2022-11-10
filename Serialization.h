@@ -2,20 +2,43 @@
 
 #include "Constants.h"
 
+#include <memory>
 #include <string>
 
-void startWriting(std::string fileName);
+class FileReader
+{
+public:
+    FileReader(std::string fileName);
+    ~FileReader();
+    void startReading();
 
-void finishWriting();
+    void finishReading();
 
-void startReading(std::string fileName);
+    void deserializeDataBatch(VecMatrixIt begin, VecMatrixIt end);
 
-void finishReading();
+private:
+    std::string m_fileName;
+    std::unique_ptr<std::ifstream> m_inputFileStream;
+    bool m_isInputFileOpen;
+};
 
-void cleanFile(std::string fileName);
+class FileWriter
+{
+public:
+    FileWriter(std::string fileName);
+    ~FileWriter();
+    void cleanFile();
 
-void serializeTimeStamp(std::string fileName, size_t timeStamp);
+    void startWriting();
 
-void serializeDataBatch(VecMatrixIt begin, VecMatrixIt end);
+    void finishWriting();
 
-void deserializeDataBatch(VecMatrixIt begin, VecMatrixIt end);
+    void serializeTimeStamp(size_t timeStamp);
+
+    void serializeDataBatch(VecMatrixIt begin, VecMatrixIt end);
+
+private:
+    std::string m_fileName;
+    std::unique_ptr<std::ofstream> m_outputFileStream;
+    bool m_isOutputFileOpen;
+};

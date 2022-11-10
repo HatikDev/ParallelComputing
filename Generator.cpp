@@ -20,15 +20,16 @@ void generateData(size_t N, std::string inFileName)
 {
     size_t done = 0;
     VecMatrix matrixes(batchSize, Matrix());
-    cleanFile(inFileName);
+    FileWriter writer(inFileName);
+    writer.cleanFile();
 
-    startWriting(inFileName);
+    writer.startWriting();
     while (done < N)
     {
         size_t count = std::min(batchSize, N - done);
         generateDataBatch(count, matrixes);
-        serializeDataBatch(matrixes.begin(), matrixes.begin() + count);
+        writer.serializeDataBatch(matrixes.begin(), matrixes.begin() + count);
         done += batchSize;
     }
-    finishWriting();
+    writer.finishWriting();
 }
