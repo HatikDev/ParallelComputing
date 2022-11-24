@@ -4,4 +4,4 @@
 
 #include <string>
 
-void transformData(size_t N, std::string inFileName, std::string outFileName);
+void transformData(int argc, char* argv[], size_t N, std::string inFileName, std::string outFileName);

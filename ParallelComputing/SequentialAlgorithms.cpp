@@ -27,7 +27,7 @@ void processArgs(int argc, char* argv[])
             throw std::logic_error("Unexpected arguments");
 
         std::string outputFile = argv[4];
-        transformData(inputDataSize * 1024 * 1024 / MATRIXWEIGHT, inputFile, outputFile);
+        transformData(argc, argv, inputDataSize * 1024 * 1024 / MATRIXWEIGHT, inputFile, outputFile);
     }
     else
     {

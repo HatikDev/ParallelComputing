@@ -24,9 +24,6 @@
     <ClCompile Include="SequentialAlgorithms.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Serialization.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="Transformation.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>

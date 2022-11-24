@@ -1,4 +1,7 @@
+#define _CRT_SECURE_NO_WARNINGS
+
 #include "Serialization.h"
+#include "Util.h"
 
 #include <iomanip>
 #include <iostream>
@@ -97,4 +100,46 @@ void FileWriter::serializeDataBatch(VecMatrixIt begin, VecMatrixIt end)
             }
         }
     }
+}
+
+ProcessReader::ProcessReader(std::string fileName, int beginPos, int endPos) : m_fileName{ fileName }, m_beginPos{ beginPos }, m_endPos{ endPos }
+{}
+
+ProcessReader::~ProcessReader()
+{}
+
+void ProcessReader::readData(VecMatrixIt begin, VecMatrixIt end)
+{
+    std::FILE* fp = std::fopen(m_fileName.c_str(), "r");
+    if (!fp)
+        throw std::exception();
+
+    int beginPos = 2 * m_beginPos;
+    int endPos = 2 * m_endPos;
+
+    std::fseek(fp, beginPos, SEEK_SET);
+
+    int oldBufferSize = (endPos - beginPos) * MATRIXWEIGHT;
+    std::vector<char> oldBuffer(oldBufferSize, 0);
+    std::fread(oldBuffer.data(), sizeof(char), oldBufferSize, fp);
+
+    int newBufferSize = (m_endPos - m_beginPos) * MATRIXWEIGHT;
+    std::vector<int> newBuffer(newBufferSize, 0);
+    for (size_t i = 0; i < oldBuffer.size() - 1; i += 2)
+        newBuffer[i / 2] = char2dec(oldBuffer[i], oldBuffer[i + 1]);
+
+    size_t counter = 0;
+    for (auto it = begin; it != end; ++it)
+    {
+        for (size_t i = 0; i < M; ++i)
+        {
+            for (size_t j = 0; j < M; ++j)
+            {
+                (*it)[i][j] = newBuffer[counter];
+                ++counter;
+            }
+        }
+    }
+
+    std::fclose(fp);
 }
