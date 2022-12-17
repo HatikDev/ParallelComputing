@@ -28,7 +28,7 @@ void generateData(size_t N, std::string inFileName)
     {
         size_t count = std::min(batchSize, N - done);
         generateDataBatch(count, matrixes);
-        writer.serializeDataBatch(matrixes.begin(), matrixes.begin() + count);
+        writer.writeData(matrixes.begin(), matrixes.begin() + count);
         done += batchSize;
     }
     writer.finishWriting();

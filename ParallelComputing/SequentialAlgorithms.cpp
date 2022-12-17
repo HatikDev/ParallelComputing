@@ -1,10 +1,13 @@
 ﻿#include "Constants.h"
 #include "Generator.h"
 #include "Serialization.h"
-#include "Transformation.h"
 
 #include <iostream>
 #include <sstream>
+
+#include "driver_types.h"
+
+cudaError_t transformData(size_t N, std::string inFileName, std::string outFileName);
 
 void processArgs(int argc, char* argv[])
 {
@@ -27,7 +30,7 @@ void processArgs(int argc, char* argv[])
             throw std::logic_error("Unexpected arguments");
 
         std::string outputFile = argv[4];
-        transformData(argc, argv, inputDataSize * 1024 * 1024 / MATRIXWEIGHT, inputFile, outputFile);
+        transformData(inputDataSize * 1024 * 1024 / MATRIXWEIGHT, inputFile, outputFile);
     }
     else
     {
