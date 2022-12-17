@@ -1,13 +1,15 @@
 ﻿#include "Constants.h"
 #include "Generator.h"
 #include "Serialization.h"
+#include "Transformation.h"
 
 #include <iostream>
 #include <sstream>
+#include <mpi.h>
 
 #include "driver_types.h"
 
-cudaError_t transformData(size_t N, std::string inFileName, std::string outFileName);
+cudaError_t cudaTransformData(size_t N, std::string inFileName, std::string outFileName);
 
 void processArgs(int argc, char* argv[])
 {
@@ -30,7 +32,27 @@ void processArgs(int argc, char* argv[])
             throw std::logic_error("Unexpected arguments");
 
         std::string outputFile = argv[4];
-        transformData(inputDataSize * 1024 * 1024 / MATRIXWEIGHT, inputFile, outputFile);
+
+        MPI_Init(&argc, &argv);
+
+        int thread;
+        MPI_Comm_rank(MPI_COMM_WORLD, &thread);
+
+        float cudaDuration;
+        size_t mpiDuration;
+        if (thread == 0)
+        {
+            size_t dataForCudaSize = inputDataSize * 1024 * 960 / MATRIXWEIGHT;
+            cudaTransformData(dataForCudaSize, inputFile, outputFile);
+        }
+
+        if (thread != 0)
+        {
+            size_t dataForMPISize = inputDataSize * 1024 * 64 / MATRIXWEIGHT;
+            mpiTransformData(argc, argv, dataForMPISize, inputFile, outputFile);
+        }
+
+        MPI_Finalize();
     }
     else
     {

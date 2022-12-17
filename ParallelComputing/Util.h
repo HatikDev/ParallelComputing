@@ -4,9 +4,9 @@
 #include <stdlib.h>
 #include <time.h>
 
-uint8_t plus(uint8_t num1, uint8_t num2);
+uint8_t host_plus(uint8_t num1, uint8_t num2);
 
-uint8_t mult(uint8_t num1, uint8_t num2);
+uint8_t host_mult(uint8_t num1, uint8_t num2);
 
 size_t getRand(size_t min, size_t max);
 

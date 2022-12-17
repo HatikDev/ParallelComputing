@@ -8,15 +8,16 @@
 #include "Generator.h"
 #include "Serialization.h"
 
-#include <iostream>
 #include <sstream>
 #include <chrono>
+
+#include <mpi.h>
 
 using std::chrono::steady_clock;
 
 namespace
 {
-__device__ int maxPower(uint16_t number)
+__device__ int dev_maxPower(uint16_t number)
 {
     int powerArray = 16384;
     for (int i = 7; i >= 0; --i)
@@ -30,12 +31,12 @@ __device__ int maxPower(uint16_t number)
 }
 }
 
-__device__ uint8_t plus(uint8_t num1, uint8_t num2)
+__device__ uint8_t dev_plus(uint8_t num1, uint8_t num2)
 {
     return num1 ^ num2;
 }
 
-__device__ uint8_t mult(uint8_t num1, uint8_t num2)
+__device__ uint8_t dev_mult(uint8_t num1, uint8_t num2)
 {
     uint16_t result = 0;
 
@@ -65,7 +66,7 @@ __device__ uint8_t mult(uint8_t num1, uint8_t num2)
 
     while (result > 255)
     {
-        int power = maxPower(result);
+        int power = dev_maxPower(result);
         result ^= 0x11b << (power - 8);
     }
 
@@ -86,7 +87,7 @@ __global__ void transformMatrix(uint8_t* coeffs, uint8_t* dev_inMatrix, uint8_t*
             sum = 0;
             for (size_t k = 0; k < M; ++k)
             {
-                sum += plus(sum, mult(coeffs[i * M + k], dev_inMatrix[k * M + j]));
+                sum += dev_plus(sum, dev_mult(coeffs[i * M + k], dev_inMatrix[k * M + j]));
             }
             dev_outMatrix[i * M + j] = sum;
         }
@@ -105,7 +106,7 @@ cudaError_t initCoeffsMatrix(uint8_t** coeffs)
     return cudaStatus;
 }
 
-cudaError_t transformData(size_t N, std::string inFileName, std::string outFileName)
+cudaError_t cudaTransformData(size_t N, std::string inFileName, std::string outFileName)
 {
     VecMatrix inMatrixes(N, Matrix());
     VecMatrix outMatrixes(N, Matrix());
@@ -227,8 +228,9 @@ cudaError_t transformData(size_t N, std::string inFileName, std::string outFileN
 
     writer.startWriting();
     writer.writeData(outMatrixes.begin(), outMatrixes.end());
-    writer.serializeTimeStamp((size_t)duration);
     writer.finishWriting();
+
+    MPI_Send(&duration, 1, MPI_FLOAT, 1, 0, MPI_COMM_WORLD);
 
 Error:
     cudaFree(dev_coeffs);

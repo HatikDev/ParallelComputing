@@ -33,7 +33,7 @@ public:
 
     void finishWriting();
 
-    void serializeTimeStamp(size_t timeStamp);
+    void serializeTimeStamp(std::string message, float timeStamp);
 
     void writeData(VecMatrixIt begin, VecMatrixIt end);
 
@@ -41,4 +41,17 @@ private:
     std::string m_fileName;
     std::unique_ptr<std::ofstream> m_outputFileStream;
     bool m_isOutputFileOpen;
+};
+
+class ProcessReader
+{
+public:
+    ProcessReader(std::string fileName, int beginPos, int endPos);
+    ~ProcessReader();
+
+    void readData(VecMatrixIt begin, VecMatrixIt end);
+private:
+    std::string m_fileName;
+    int m_beginPos;
+    int m_endPos;
 };

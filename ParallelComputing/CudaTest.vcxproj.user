@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LocalDebuggerCommand>C:\Users\doroshin\source\repos\CudaTest\x64\Debug\ParallelComputing.exe</LocalDebuggerCommand>
+    <LocalDebuggerCommandArguments>transform 1 input.txt output.txt</LocalDebuggerCommandArguments>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerWorkingDirectory>..\x64\Debug</LocalDebuggerWorkingDirectory>
+  </PropertyGroup>
+</Project>
